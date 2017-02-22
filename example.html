@@ -1,0 +1,25 @@
+<html>
+<head>
+</head>
+<body>
+<p id="counter">0</p>
+</body>
+<script>
+
+var the_count = 0;
+
+document.querySelector('body').innerHTML += "<p>Hello!</p>";
+
+document.querySelector('#counter').addEventListener('click', function(){ 
+	the_count++;
+	document.querySelector('#counter').innerHTML = the_count; 
+});
+
+document.addEventListener('keydown', function(e){
+	document.querySelector('#counter').innerHTML = e.keyCode;
+	the_count++;
+	//document.querySelector('#counter').innerHTML = the_count; 
+})
+
+</script>
+</html>

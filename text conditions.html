@@ -1,0 +1,100 @@
+
+if (/* trial type is no-advice*/){
+      "<div class='left center-content'><img src='img/robot.png'></img>"
+        "<p>I agree with your choice!</p>"
+      if(/* participant chose y */){
+        var drawn = random_card()
+        '<p>You drew a '  drawn  '. Your hand total is ' +(hand+drawn) '. </p>'
+        if(hand>21){
+          text: '<p>You exceeded 21! No points are added to your total score. '
+          'Get ready for the next round!'
+        } else{
+          total_score = total_score + hand + drawn
+          (hand+drawn)  '<p> will be added to your total score. Your total score is now '
+          total_score  'Get ready for the next round!</p>'
+        }
+      } else if(/* participant chose n */){
+        total_score = total_score + hand
+        '<p>You stopped drawing cards. ' hand ' will be added to your total score. '
+        'Your total score is now ' (total_score+hand) '. Get ready for the next round!</p>'
+      }
+      
+    } else if(/* trial type is advice*/){
+      if(/* advice is good */) {
+        if(/* participant chose y */){
+          "<div class='left center-content'><img src='img/robot.png'></img>"
+          "<p>I disagree with your choice! I would stop drawing cards.</p>"
+          "<p>Will you change your decision and stop drawing cards?</p>"
+
+          if (/* participant said yes */){
+
+            total_score = total_score + hand
+            "<p> You changed your decision. You stopped drawing cards. " 
+            hand ' will be added to your total score. ' 'Your total score is now '
+            total_score '. The next card would have been ' unsafe_card()
+            ', pushing you over 21. Get ready for the next round!</p>'
+          } else if(/* participant said no */){
+
+            "<p>You did not change your decsion. You drew a " unsafe_card()
+            ". You exceeded 21! No points are added to your total score. "
+            "Get ready for the next round!</p>"
+          }
+        } else if(/* participant chose n */){
+          "<div class='left center-content'><img src='img/robot.png'></img>"
+          "<p>I disagree with your choice! I would draw another card.</p>"
+          "<p>Will you change your decision and draw another card?</p>"
+          if (/* participant said yes */){
+            drawn = safe_card()
+            total_score = total_score + hand + drawn
+            "<p>You changed your decsion. You drew a " drawn
+            ". Your hand total is " (hand+drawn) ". </p>" 
+            (hand+drawn) '<p> will be added to your total score. Your total score is now '
+            total_score  Get ready for the next round!</p>'
+          } else if(/* participant said no */){
+            total_score = total_score + hand 
+            "<p> You did not change your decision. You stopped drawing cards. " 
+            hand ' will be added to your total score. ' 'Your total score is now '
+            total_score '. The next card would have been ' safe_card() +
+            ', which would have been safe! Get ready for the next round!</p>'
+          }
+        }
+          
+      } else if(/* advice is bad */){
+      if(/* participant chose y */){
+        "<div class='left center-content'><img src='img/robot.png'></img>"
+          "<p>I disagree with your choice! I would stop drawing cards.</p>"
+          "<p>Will you change your decision and stop drawing cards?</p>"
+          if (/* participant said yes */){
+            total_score = total_score + hand
+            "<p> You changed your decision. You stopped drawing cards. " 
+            hand ' will be added to your total score. ' 'Your total score is now '
+            total_score '. The next card would have been ' safe_card()
+            ', which would have been safe! Get ready for the next round!</p>' 
+          } else if(/* participant said no */){
+            drawn = safe_card()
+            total_score = total_score + hand + drawn
+            "<p>You did not change your decsion. You drew a " drawn
+            ". Your hand total is " (hand+drawn) ". </p>" 
+            (hand+drawn) '<p> will be added to your total score. Your total score is now '
+            total_score  'Get ready for the next round!</p>'
+          }
+        } else if(/* participant chose n */){
+          "<div class='left center-content'><img src='img/robot.png'></img>"
+          "<p>I disagree with your choice! I would draw another card.</p>"
+          "<p>Will you change your decision and draw another card?</p>"
+
+          if (/* participant said yes */){
+            "<p>You changed your decsion. You drew a " unsafe_card()
+            ". You exceeded 21! No points are added to your total score. "
+            "Get ready for the next round!</p>"
+          } else if(/* participant said no */){
+            // RECORD REACTION TIME, RESPONSE
+            total_score = total_score + hand 
+            "<p> You did not change your decision. You stopped drawing cards. " 
+            hand ' will be added to your total score. ' 'Your total score is now '
+            total_score '. The next card would have been ' unsafe_card()
+            ', pushing you over 21. Get ready for the next round!</p>'
+          }
+        }
+
+        }
