@@ -55,7 +55,14 @@ jsPsych.plugins["round"] = (function() {
 	card_text.innerHTML = html;
 
 	var draw_card_listener = function(e){
-		if(e.keyCode == 89 /* pressed yes*/){
+		var keyListenerN = jsPsych.pluginAPI.getKeyboardResponse({
+			callback_function: draw_card_listener,
+			valid_responses: ['y', 'n'],
+			rt_method: 'date',
+			persist: false,
+			allow_held_key: false
+		});
+		if(info.key == 'y'){
 			if(trial_type == 0) {
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I agree with your choice!</p>"
@@ -73,24 +80,37 @@ jsPsych.plugins["round"] = (function() {
 					card_text.innerHTML += total_score
 					card_text.innerHTML += ". <p>Get ready for the next round!</p>"
 				}
-				document.removeEventListener('keydown', draw_card_listener);
+				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 			}
 			else if(trial_type == 1){
-				document.removeEventListener('keydown', draw_card_listener);
+				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I disagree with your choice! I would stop drawing cards.</p>"
 				card_text.innerHTML += "<p>Will you change your decision and stop drawing cards?</p>"
-				document.addEventListener('keydown', good_stop_listener);
+				
+				var keyListenerGS = jsPsych.pluginAPI.getKeyboardResponse({
+					callback_function: good_stop_listener,
+					valid_responses: ['y', 'n'],
+					rt_method: 'date',
+					persist: false,
+					allow_held_key: false
+				});
 			}
 			else if(trial_type == 2){
-				document.removeEventListener('keydown', draw_card_listener);
+				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I disagree with your choice! I would stop drawing cards.</p>"
 				card_text.innerHTML += "<p>Will you change your decision and stop drawing cards?</p>"
-				document.addEventListener('keydown', bad_stop_listener);
+				var keyListenerBS = jsPsych.pluginAPI.getKeyboardResponse({
+					callback_function: bad_stop_listener,
+					valid_responses: ['y', 'n'],
+					rt_method: 'date',
+					persist: false,
+					allow_held_key: false
+				});
 			}
 		}
-		else if(e.keyCode == 78 /* pressed no*/){
+		else if(info.key == 'n'){
 			if(trial_type == 0) {
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I agree with your choice!</p>"
@@ -102,22 +122,34 @@ jsPsych.plugins["round"] = (function() {
 				card_text.innerHTML += total_score
 				card_text.innerHTML += ". Get ready for the next round!" 
 
-				document.removeEventListener('keydown', draw_card_listener);
+				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 			}
 			else if(trial_type == 1){
-				document.removeEventListener('keydown', draw_card_listener);
+				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I disagree with your choice! I would draw another card.</p>"
 				card_text.innerHTML += "<p>Will you change your decision and draw another card?</p>"
-				document.addEventListener('keydown', good_draw_listener);
+				var keyListenerGD = jsPsych.pluginAPI.getKeyboardResponse({
+					callback_function: good_draw_listener,
+					valid_responses: ['y', 'n'],
+					rt_method: 'date',
+					persist: false,
+					allow_held_key: false
+				});
 
 			}
 			else if(trial_type == 2){
-				document.removeEventListener('keydown', draw_card_listener);
+				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I disagree with your choice! I would draw another card.</p>"
 				card_text.innerHTML += "<p>Will you change your decision and draw another card?</p>"
-				document.addEventListener('keydown', bad_draw_listener);
+				var keyListenerBD = jsPsych.pluginAPI.getKeyboardResponse({
+					callback_function: bad_draw_listener,
+					valid_responses: ['y', 'n'],
+					rt_method: 'date',
+					persist: false,
+					allow_held_key: false
+				});
 			}
 		}
 		update_score();
@@ -126,7 +158,7 @@ jsPsych.plugins["round"] = (function() {
 
 // Stopping is a good idea
 var good_stop_listener = function(e){
-	if(e.keyCode == 89 /* pressed yes*/){
+	if(info.key == 'y'){
     //Record reaction time, decision
     total_score = total_score + hand
     var new_text = "<p> You changed your decision. You stopped drawing cards. " + hand + ' will be added to your total score. </p>'
@@ -136,20 +168,20 @@ var good_stop_listener = function(e){
     new_text = ". The next card would have been " + unsafe_card() + ", pushing you over 21."
     card_text.innerHTML += new_text
     card_text.innerHTML += "<p>Get ready for the next round!</p>"
-    document.removeEventListener('keydown', good_stop_listener);
+    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGS);
 }
-else if(e.keyCode == 78 /* pressed no*/){
+else if(info.key == 'n'){
     //Record reaction time, decision
     var new_text = "<p>You did not change your decsion. You drew a " + unsafe_card()
     card_text.innerHTML += ". You exceeded 21! No points are added to your total score. "
     card_text.innerHTML += "Get ready for the next round!</p>"
-    document.removeEventListener('keydown', good_stop_listener);
+    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGS);
 }
 }
 
 // Stopping is a bad idea
 var bad_stop_listener = function(e){
-	if(e.keyCode == 89 /* pressed yes*/){
+	if(info.key == 'y'){
     //Record reaction time, decision
     total_score = total_score + hand
     var new_text = "<p> You changed your decision. You stopped drawing cards. " + hand + ' will be added to your total score. </p>'
@@ -159,10 +191,10 @@ var bad_stop_listener = function(e){
     new_text = ". The next card would have been " + safe_card() + ", which would have been safe."
     card_text.innerHTML += new_text
     card_text.innerHTML += "<p> Get ready for the next round!</p>"
-    document.removeEventListener('keydown', bad_stop_listener);
+    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBS);
 
 }
-else if(e.keyCode == 78 /* pressed no*/){
+else if(info.key == 'n'){
     //Record reaction time, decision
     drawn = safe_card()
     total_score = total_score + hand + drawn
@@ -171,13 +203,13 @@ else if(e.keyCode == 78 /* pressed no*/){
     var new_text2 = "<p>" + (hand+drawn)  + '<p> will be added to your total score. Your total score is now ' + total_score + ". The next card would have been " + unsafe_card() + ', pushing you over 21.</p>'
     card_text.innerHTML += new_text2
     card_text.innerHTML += '<p>Get ready for the next round!</p>'
-    document.removeEventListener('keydown', bad_stop_listener);
+    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBS);
 }
 }
 
 // Drawing is a good idea
 var good_draw_listener = function(e){
-	if(e.keyCode == 89 /* pressed yes*/){
+	if(info.key == 'y'){
     //Record reaction time, decision
     drawn = safe_card()
     total_score = total_score + hand + drawn
@@ -186,9 +218,9 @@ var good_draw_listener = function(e){
     var new_text2 = '<p>' + (hand+drawn) + ' will be added to your total score. Your total score is now ' + total_score
     card_text.innerHTML +=new_text2
     card_text.innerHTML +=  "<p>Get ready for the next round!</p>"
-    document.removeEventListener('keydown', good_draw_listener);
+    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGD);
 }
-else if(e.keyCode == 78 /* pressed no*/){
+else if(info.key == 'n'){
     //Record reaction time, decision
     total_score = total_score + hand 
     card_text.innerHTML = "<p> You did not change your decision. You stopped drawing cards. " 
@@ -197,13 +229,13 @@ else if(e.keyCode == 78 /* pressed no*/){
     var new_text2 = '<p>The next card would have been ' + safe_card() +', which would have been safe!</p>'
     card_text.innerHTML += new_text2
     card_text.innerHTML += '<p>Get ready for the next round!</p>'
-    document.removeEventListener('keydown', good_draw_listener);
+    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGD);
 }
 }
 
 // Drawing is a bad idea
 var bad_draw_listener = function(e){
-	if(e.keyCode == 89 /* pressed yes*/){
+	if(info.key == 'y'){
     //Record reaction time, decision
     // convert to plugin
     // .key, .rt
@@ -211,22 +243,18 @@ var bad_draw_listener = function(e){
     card_text.innerHTML = new_text
     card_text.innerHTML += "<p>You exceeded 21! No points are added to your total score. </p>"
     card_text.innerHTML += "<p>Get ready for the next round!</p>"
-    document.removeEventListener('keydown', bad_draw_listener);
+    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBD);
 }
-else if(e.keyCode == 78 /* pressed no*/){
+else if(info.key == 'n'){
     //Record reaction time, decision
     total_score = total_score + hand 
     card_text.innerHTML = "<p> You did not change your decision. You stopped drawing cards.</p>" 
     var new_text = "<p>" + hand + ' will be added to your total score. Your total score is now ' + total_score + '. The next card would have been ' + unsafe_card() +', pushing you over 21.'
     card_text.innerHTML += new_text
     card_text.innerHTML += '<p>Get ready for the next round!</p>'
-    document.removeEventListener('keydown', bad_draw_listener);
+    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBD);
 }
 }
-
-
-document.addEventListener('keydown', draw_card_listener);
-// code copied from html file ends here
 
 
 	// data saving
