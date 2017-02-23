@@ -1,207 +1,69 @@
 <!doctype html>
 <html>
-  <head>
-    <title>My experiment</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="jspsych/jspsych.js"></script>
-    <script src="jspsych/plugins/jspsych-text.js"></script>
-    <script src="jspsych/plugins/jspsych-single-stim.js"></script>
-    <link href="jspsych/css/jspsych.css" rel="stylesheet" type="text/css"></link>
-  </head>
-  <body>
-  </body>
-  <script>
+<head>
+  <title>My experiment</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="jspsych/jspsych.js"></script>
+  <script src="jspsych/plugins/jspsych-text.js"></script>
+  <script src="jspsych/plugins/jspsych-single-stim.js"></script>
+  <script src="round-plugin.js"></script>
+  <link href="jspsych/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+</head>
+<body>
+</body>
+<script>
 
  /* define welcome message block */
-  var welcome_block = {
-    type: "text",
-    text: "Welcome to the experiment. Press any key to begin."
-  };
+ var welcome_block = {
+  type: "text",
+  text: "Welcome to the experiment. Press any key to begin."
+};
 
-  /* define instructions block */
-  var instructions_block = {
-    type: "text",
-    text: "<p>In this experiment, you will be dealt a hand of cards, " +
-        "and you will see the hand's total. You will have the option to draw another card.</p>" +
-        "<p>If your hand's total  is <strong>over 21</strong>, you lose " +
-        "and no points are added to your total score.</p>" +
-        " <p>If your hand's total is <strong>under 21</strong>, you win " +
-        "and the hand's total is added to your total score.</p>" +
-        "<p> Draw a card by pressing Y for yes, or N for no when prompted.</p>"
-        "<div class='left center-content'><img src='img/robot.png'></img>" +
-        "<p>This robot will give you advice at the end of every round. You will " +
-        "have the option to change your decision to agree with him, or not, by " +
-        "pressing Y for yes and N for no.</p>"
-        "<p>Press any key to begin.</p>",
-    timing_post_trial: 2000
-  };
+/* define instructions block */
+var instructions_block = {
+  type: "text",
+  text: "<p>In this experiment, you will be dealt a hand of cards, " +
+  "and you will see the hand's total. You will have the option to draw another card.</p>" +
+  "<p>If your hand's total  is <strong>over 21</strong>, you lose " +
+  "and no points are added to your total score.</p>" +
+  " <p>If your hand's total is <strong>under 21</strong>, you win " +
+  "and the hand's total is added to your total score.</p>" +
+  "<p> Draw a card by pressing Y for yes, or N for no when prompted.</p>"+
+  "<div class='left center-content'><img src='img/robot.png'></img>" +
+  "<p>This robot will give you advice at the end of every round. You will " +
+  "have the option to change your decision to agree with him, or not, by " +
+  "pressing Y for yes and N for no.</p>"+
+  "<p>Press any key to begin.</p>",
+  timing_post_trial: 1500
+};
 
+var test_block = {
+  type: "round",
+  timeline: [
+  {advice_type: 0,
+   total_score: 0},
+  {advice_type: 0,
+  total_score: total_score},
+  {advice_type: 1,
+  total_score: total_score},
+  {advice_type: 1,
+  total_score: total_score},
+  {advice_type: 2,
+  total_score: total_score}
 
+  // ETC. How to get total score param from the plugin and pass it into the next round?
+  // otherwise the total score resets to 0 each time. 
 
-  var total_score = 0;
-  var hand = 0;
-
-  var starting_hand = function() {
-  	return Math.floor( Math.random() * 9 ) + 11;
+    ]
   }
 
-  var random_card = function() {
-  	return Math.floor( Math.random() * 9) + 1;
-  }
 
-  var safe_card = function() {
-  	return Math.floor( Math.random() * (21-hand)) + 1;
-  }
-
-  var unsafe_card = function() {
-  	return Math.floor( Math.random() * (32-hand)) + (22-hand);
-  }
-
-
-  var no_advice_stop = {
-  	type: "text",
-  	// update total score to include hand
-  	text: '<p>You stopped drawing cards. ' + hand + ' will be added to your total score. ' +
-    		'Your total score is now ' + (total_score+hand) + '. Get ready for the next round!</p>'
-  }
-
-  var no_advice_draw = {
-  	type: "text",
-  	// establish that drawn is the random card function
-  	text: '<p>You drew a ' + drawn + '. Your hand total is ' + (hand+drawn) +
-    		'. </p>'
-  }
-
-  var no_advice_unsafe = {
-  	type: "text",
-  	text: '<p>You exceeded 21! No points are added to your total score. ' +
-  		'Get ready for the next round!'
-  }
-
-  var no_advice_safe = {
-  	// update total score to be itself + hand + drawn
-  	type: "text",
-  	text: (hand+drawn) + '<p> will be added to your total score. Your total score is now ' +
-    	total_score +' Get ready for the next round!</p>'
-  }
-
-  var bot_agrees = {
-  	type: "text",
-  	text: "<div class='left center-content'><img src='img/robot.png'></img>" +
-    		"<p>I agree with your choice!</p>"
-  }
-
-  var bot_says_stop = {
-  	type: "text",
-  	text: "<div class='left center-content'><img src='img/robot.png'></img>" +
-    			"<p>I disagree with your choice! I would stop drawing cards.</p>" +
-    			"<p>Will you change your decision and stop drawing cards?</p>",
-    choices: ['Y', 'N'] 
-  }
-
-  var bot_says_draw = {
-  	type: "text",
-  	text: "<div class='left center-content'><img src='img/robot.png'></img>" +
-    			"<p>I disagree with your choice! I would draw another card.</p>" +
-    			"<p>Will you change your decision and draw another card?</p>",
-    choices: ['Y', 'N']
-  }
-
-  var agree_to_good_stop = {
-  	type: "text",
-  	//add hand to total score
-	text:"<p> You changed your decision. You stopped drawing cards. " + 
-    	hand + ' will be added to your total score. ' + 'Your total score is now ' +
-    	total_score + '. The next card would have been ' + unsafe_card() +
-    	', pushing you over 21. Get ready for the next round!</p>'
-  }
-
-  var disagree_to_good_stop = {
-  	type: "text",
-  	text:"<p>You did not change your decsion. You drew a " + unsafe_card() +
-    	". You exceeded 21! No points are added to your total score. " +
-    	"Get ready for the next round!</p>"
-  }
-
-  var agree_to_bad_stop = {
-  	type: "text",
-  	//add hand to total score
-  	text:"<p> You changed your decision. You stopped drawing cards. " + 
-    	hand + ' will be added to your total score. ' + 'Your total score is now ' +
-    	total_score + '. The next card would have been ' + safe_card() +
-    	', which would have been safe! Get ready for the next round!</p>' 
-  }
-
-  var disagree_to_bad_stop = {
-  	type: "text",
-  	//draw safe card, add hand and drawn to total score
-  	text:"<p>You did not change your decsion. You drew a " + drawn +
-    	". Your hand total is " + (hand+drawn) + ". </p>" + 
-    	(hand+drawn) + '<p> will be added to your total score. Your total score is now ' +
-    	total_score +' Get ready for the next round!</p>'
-  }
-
-  var agree_to_good_draw = {
-  	type: "text",
-  	//draw safe card, add hand and drawn to total score
-	text:"<p>You changed your decsion. You drew a " + drawn +
-    	". Your hand total is " + (hand+drawn) + ". </p>" + 
-    	(hand+drawn) + '<p> will be added to your total score. Your total score is now ' +
-    	total_score +' Get ready for the next round!</p>'
-  }
-
-  var disagree_to_good_draw = {
-  	type: "text",
-  	//add hand to total score
-  	text:"<p> You did not change your decision. You stopped drawing cards. " + 
-    	hand + ' will be added to your total score. ' + 'Your total score is now ' +
-    	total_score + '. The next card would have been ' + safe_card() +
-    	', which would have been safe! Get ready for the next round!</p>'
-  }
-
-  var agree_to_bad_draw = {
-  	type: "text",
-  	text:"<p>You changed your decsion. You drew a " + unsafe_card() +
-    	". You exceeded 21! No points are added to your total score. " +
-    	"Get ready for the next round!</p>"
-  }
-
-  var disagree_to_bad_draw = {
-  	type: "text",
-  	// add hand to total score
-  	text:"<p> You did not change your decision. You stopped drawing cards. " + 
-    	hand + ' will be added to your total score. ' + 'Your total score is now ' +
-    	total_score + '. The next card would have been ' + unsafe_card() +
-    	', pushing you over 21. Get ready for the next round!</p>'
-  }
-
-  var hand_trial = {
-    type: "text",
-    text: '<p>Your hand total is ' + starting_hand() +
-       '. Do you want to draw another card?</p>',
-    choices: ['Y', 'N'] 
-  };
-
-
-
-
-
-/*
-TO DO:
-- Figure out how to call hand_trial x times, each time with a specific set of tags
-	- ex: first time is advice=false, quality=none, second time is advice=true, quality=good, and so on
-- Figure out how to complete the if statements in the conditionals in accordance with these tags
-- Add said list of hand_trials to the timeline
-- Record reaction time and responses themselves
-- Determine if the syntax of what I wrote above is at all valid
-
-*/
 
   /* create experiment timeline array */
   var timeline = [];
   timeline.push(welcome_block);
-  timeline.push(instructions_block);
-  timeline.push(hand_trial);
+  //timeline.push(instructions_block);
+  timeline.push(test_block);
 
   /* start the experiment */
   jsPsych.init({

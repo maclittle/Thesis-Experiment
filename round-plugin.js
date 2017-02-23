@@ -6,23 +6,26 @@ jsPsych.plugins["round"] = (function() {
 	plugin.trial = function(display_element, trial) {
 
 	// Default value for trial/advice type parameter (no advice)
-	trial.trial_type = trial.trial_type || 0
+	trial.advice_type = trial.advice_type || 0
+	trial.total_score = trial.total_score || 0
 
 
 	trial = jsPsych.pluginAPI.evaluateFunctionParameters(trial);
 
 	// Here starts code from the html file
-	<div class="jspsych-display-element" style="margin:0px; height: 100%;">
-	<div class="jspsych-content-wrapper">
-	<div id="jspsych-content" class="jspsych-content">
-	<div id="score"></div>
-	<div id="card_text"></div>
+	var base_html = '<div class="jspsych-display-element" style="margin:0px; height: 100%;">'+
+	'<div class="jspsych-content-wrapper">'+
+	'<div id="jspsych-content" class="jspsych-content">'+
+	'<div id="score"></div>'+
+	'<div id="card_text"></div>'
+
+	display_element.innerHTML = base_html;
+
+	var choice_history = []
+	var rt_history = []
 
 
-	var display_element = document.querySelector('#jspsych-content');
 	var card_text = display_element.querySelector('#card_text');
-
-	var total_score = 0;
 	var hand = 0;
 
 	var starting_hand = function() {
@@ -42,7 +45,7 @@ jsPsych.plugins["round"] = (function() {
 	}
 
 	function update_score(){
-		display_element.querySelector('#score').innerHTML = total_score;
+		display_element.querySelector('#score').innerHTML = trial.total_score;
 	}
 
 	update_score();
@@ -54,16 +57,12 @@ jsPsych.plugins["round"] = (function() {
 
 	card_text.innerHTML = html;
 
-	var draw_card_listener = function(e){
-		var keyListenerN = jsPsych.pluginAPI.getKeyboardResponse({
-			callback_function: draw_card_listener,
-			valid_responses: ['y', 'n'],
-			rt_method: 'date',
-			persist: false,
-			allow_held_key: false
-		});
-		if(info.key == 'y'){
-			if(trial_type == 0) {
+	var draw_card_listener = function(info){
+		// info.rt
+		if(info.key == 89){
+			choice_history.push(info.key);
+			rt_history.push(info.key);
+			if(trial.advice_type == 0) {
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I agree with your choice!</p>"
 				var drawn = random_card()
@@ -74,15 +73,15 @@ jsPsych.plugins["round"] = (function() {
 					card_text.innerHTML += "<p>You exceeded 21! No points are added to your total score.</p>"
 					card_text.innerHTML += "<p>Get ready for the next round!</p>"
 				} else {
-					total_score = total_score + hand
-					card_text.innerHTML += (hand)
-					card_text.innerHTML += " will be added to your total score. Your total score is now "
-					card_text.innerHTML += total_score
-					card_text.innerHTML += ". <p>Get ready for the next round!</p>"
+					trial.total_score = trial.total_score + hand
+					var txt = "<p>" +hand + " will be added to your total score. Your total score is now " + trial.total_score + ".</p>" 
+					card_text.innerHTML += txt
+					card_text.innerHTML += "<p>Get ready for the next round!</p>"
 				}
 				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
+				endtrial()
 			}
-			else if(trial_type == 1){
+			else if(trial.advice_type == 1){
 				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I disagree with your choice! I would stop drawing cards.</p>"
@@ -96,7 +95,7 @@ jsPsych.plugins["round"] = (function() {
 					allow_held_key: false
 				});
 			}
-			else if(trial_type == 2){
+			else if(trial.advice_type == 2){
 				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I disagree with your choice! I would stop drawing cards.</p>"
@@ -110,21 +109,23 @@ jsPsych.plugins["round"] = (function() {
 				});
 			}
 		}
-		else if(info.key == 'n'){
-			if(trial_type == 0) {
+		else if(info.key == 78){
+			choice_history.push(info.key);
+			rt_history.push(info.key);
+			if(trial.advice_type == 0) {
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I agree with your choice!</p>"
-				total_score = total_score + hand
+				trial.total_score = trial.total_score + hand
 				card_text.innerHTML += "You stopped drawing cards. ";
 				card_text.innerHTML += hand
 				card_text.innerHTML += " will be added to your total score. ";
-				card_text.innerHTML += "Your total score is now "
-				card_text.innerHTML += total_score
-				card_text.innerHTML += ". Get ready for the next round!" 
-
+				var txt = "<p>Your total score is now " + trial.total_score + ".</p>"
+				card_text.innerHTML += txt
+				card_text.innerHTML += "<p>Get ready for the next round!</p>" 
 				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
+				endtrial()
 			}
-			else if(trial_type == 1){
+			else if(trial.advice_type == 1){
 				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I disagree with your choice! I would draw another card.</p>"
@@ -138,7 +139,7 @@ jsPsych.plugins["round"] = (function() {
 				});
 
 			}
-			else if(trial_type == 2){
+			else if(trial.advice_type == 2){
 				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
 				card_text.innerHTML = "<img src='img/robot.png'></img>"
 				card_text.innerHTML += "<p>I disagree with your choice! I would draw another card.</p>"
@@ -155,118 +156,148 @@ jsPsych.plugins["round"] = (function() {
 		update_score();
 	}
 
-
-// Stopping is a good idea
-var good_stop_listener = function(e){
-	if(info.key == 'y'){
-    //Record reaction time, decision
-    total_score = total_score + hand
-    var new_text = "<p> You changed your decision. You stopped drawing cards. " + hand + ' will be added to your total score. </p>'
-    card_text.innerHTML = new_text
-    card_text.innerHTML += "Your total score is now "
-    card_text.innerHTML += total_score
-    new_text = ". The next card would have been " + unsafe_card() + ", pushing you over 21."
-    card_text.innerHTML += new_text
-    card_text.innerHTML += "<p>Get ready for the next round!</p>"
-    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGS);
-}
-else if(info.key == 'n'){
-    //Record reaction time, decision
-    var new_text = "<p>You did not change your decsion. You drew a " + unsafe_card()
-    card_text.innerHTML += ". You exceeded 21! No points are added to your total score. "
-    card_text.innerHTML += "Get ready for the next round!</p>"
-    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGS);
-}
-}
+	// Stopping is a good idea
+	var good_stop_listener = function(info){
+		if(info.key == 89){
+		    //Record reaction time, decision
+		    choice_history.push(info.key);
+			rt_history.push(info.key);
+		    trial.total_score = trial.total_score + hand
+		    var new_text = "<p> You changed your decision. You stopped drawing cards. " + hand + ' will be added to your total score. </p>'
+		    card_text.innerHTML = new_text
+		    card_text.innerHTML += "Your total score is now "
+		    card_text.innerHTML += trial.total_score
+		    new_text = ". The next card would have been " + unsafe_card() + ", pushing you over 21."
+		    card_text.innerHTML += new_text
+		    card_text.innerHTML += "<p>Get ready for the next round!</p>"
+		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGS);
+		    endtrial()
+		} else if(info.key == 78){
+		    //Record reaction time, decision
+		    choice_history.push(info.key);
+			rt_history.push(info.key);
+		    var new_text = "<p>You did not change your decsion. You drew a " + unsafe_card()
+		    card_text.innerHTML += ". You exceeded 21! No points are added to your total score. "
+		    card_text.innerHTML += "Get ready for the next round!</p>"
+		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGS);
+		    endtrial()
+		}
+	}
 
 // Stopping is a bad idea
-var bad_stop_listener = function(e){
-	if(info.key == 'y'){
-    //Record reaction time, decision
-    total_score = total_score + hand
-    var new_text = "<p> You changed your decision. You stopped drawing cards. " + hand + ' will be added to your total score. </p>'
-    card_text.innerHTML = new_text
-    card_text.innerHTML += "Your total score is now "
-    card_text.innerHTML += total_score
-    new_text = ". The next card would have been " + safe_card() + ", which would have been safe."
-    card_text.innerHTML += new_text
-    card_text.innerHTML += "<p> Get ready for the next round!</p>"
-    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBS);
+	var bad_stop_listener = function(info){
+		if(info.key == 89){
+		    //Record reaction time, decision
+		    choice_history.push(info.key);
+			rt_history.push(info.key);
+		    trial.total_score = trial.total_score + hand
+		    var new_text = "<p> You changed your decision. You stopped drawing cards. " + hand + ' will be added to your total score. </p>'
+		    card_text.innerHTML = new_text
+		    card_text.innerHTML += "Your total score is now "
+		    card_text.innerHTML += trial.total_score
+		    new_text = ". The next card would have been " + safe_card() + ", which would have been safe."
+		    card_text.innerHTML += new_text
+		    card_text.innerHTML += "<p> Get ready for the next round!</p>"
+		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBS);
+		    endtrial()
 
-}
-else if(info.key == 'n'){
-    //Record reaction time, decision
-    drawn = safe_card()
-    total_score = total_score + hand + drawn
-    var new_text = "<p>You did not change your decsion. You drew a " + drawn + ". Your hand total is " +(hand+drawn) +". </p>" 
-    card_text.innerHTML = new_text
-    var new_text2 = "<p>" + (hand+drawn)  + '<p> will be added to your total score. Your total score is now ' + total_score + ". The next card would have been " + unsafe_card() + ', pushing you over 21.</p>'
-    card_text.innerHTML += new_text2
-    card_text.innerHTML += '<p>Get ready for the next round!</p>'
-    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBS);
-}
-}
+		}
+		else if(info.key == 78){
+		    //Record reaction time, decision
+		    choice_history.push(info.key);
+			rt_history.push(info.key);
+		    drawn = safe_card()
+		    trial.total_score = trial.total_score + hand + drawn
+		    var new_text = "<p>You did not change your decsion. You drew a " + drawn + ". Your hand total is " +(hand+drawn) +". </p>" 
+		    card_text.innerHTML = new_text
+		    var new_text2 = "<p>" + (hand+drawn)  + '<p> will be added to your total score. Your total score is now ' + trial.total_score + ". The next card would have been " + unsafe_card() + ', pushing you over 21.</p>'
+		    card_text.innerHTML += new_text2
+		    card_text.innerHTML += '<p>Get ready for the next round!</p>'
+		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBS);
+		    endtrial()
+		}
+	}
 
 // Drawing is a good idea
-var good_draw_listener = function(e){
-	if(info.key == 'y'){
-    //Record reaction time, decision
-    drawn = safe_card()
-    total_score = total_score + hand + drawn
-    var new_text = "<p>You changed your decsion. You drew a " + drawn + ". Your hand total is " + (hand+drawn) + ". </p>" 
-    card_text.innerHTML += new_text
-    var new_text2 = '<p>' + (hand+drawn) + ' will be added to your total score. Your total score is now ' + total_score
-    card_text.innerHTML +=new_text2
-    card_text.innerHTML +=  "<p>Get ready for the next round!</p>"
-    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGD);
-}
-else if(info.key == 'n'){
-    //Record reaction time, decision
-    total_score = total_score + hand 
-    card_text.innerHTML = "<p> You did not change your decision. You stopped drawing cards. " 
-    var new_text = hand  + ' will be added to your total score. Your total score is now ' + total_score + '.</p>'
-    card_text.innerHTML += new_text
-    var new_text2 = '<p>The next card would have been ' + safe_card() +', which would have been safe!</p>'
-    card_text.innerHTML += new_text2
-    card_text.innerHTML += '<p>Get ready for the next round!</p>'
-    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGD);
-}
-}
+	var good_draw_listener = function(info){
+		if(info.key == 89){
+		    //Record reaction time, decision
+		    choice_history.push(info.key);
+			rt_history.push(info.key);
+		    drawn = safe_card()
+		    trial.total_score = trial.total_score + hand + drawn
+		    var new_text = "<p>You changed your decision. You drew a " + drawn + ". Your hand total is " + (hand+drawn) + ". </p>" 
+		    card_text.innerHTML = new_text
+		    var new_text2 = '<p>' + (hand+drawn) + ' will be added to your total score. Your total score is now ' + trial.total_score
+		    card_text.innerHTML +=new_text2
+		    card_text.innerHTML +=  "<p>Get ready for the next round!</p>"
+		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGD);
+		    endtrial()
+		}
+		else if(info.key == 78){
+		    //Record reaction time, decision
+		    choice_history.push(info.key);
+			rt_history.push(info.key);
+		    trial.total_score = trial.total_score + hand 
+		    card_text.innerHTML = "<p> You did not change your decision. You stopped drawing cards. " 
+		    var new_text = hand  + ' will be added to your total score. Your total score is now ' + trial.total_score + '.</p>'
+		    card_text.innerHTML += new_text
+		    var new_text2 = '<p>The next card would have been ' + safe_card() +', which would have been safe!</p>'
+		    card_text.innerHTML += new_text2
+		    card_text.innerHTML += '<p>Get ready for the next round!</p>'
+		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGD);
+		    endtrial()
+		}
+	}
 
 // Drawing is a bad idea
-var bad_draw_listener = function(e){
-	if(info.key == 'y'){
-    //Record reaction time, decision
-    // convert to plugin
-    // .key, .rt
-    var new_text = "<p>You changed your decsion. You drew a " + unsafe_card() + ".</p>"
-    card_text.innerHTML = new_text
-    card_text.innerHTML += "<p>You exceeded 21! No points are added to your total score. </p>"
-    card_text.innerHTML += "<p>Get ready for the next round!</p>"
-    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBD);
-}
-else if(info.key == 'n'){
-    //Record reaction time, decision
-    total_score = total_score + hand 
-    card_text.innerHTML = "<p> You did not change your decision. You stopped drawing cards.</p>" 
-    var new_text = "<p>" + hand + ' will be added to your total score. Your total score is now ' + total_score + '. The next card would have been ' + unsafe_card() +', pushing you over 21.'
-    card_text.innerHTML += new_text
-    card_text.innerHTML += '<p>Get ready for the next round!</p>'
-    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBD);
-}
-}
+	var bad_draw_listener = function(info){
+		if(info.key == 89){
+			choice_history.push(info.key);
+			rt_history.push(info.key);
+		    var new_text = "<p>You changed your decsion. You drew a " + unsafe_card() + ".</p>"
+		    card_text.innerHTML = new_text
+		    card_text.innerHTML += "<p>You exceeded 21! No points are added to your total score. </p>"
+		    card_text.innerHTML += "<p>Get ready for the next round!</p>"
+		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBD);
+		    endtrial()
+		}
+		else if(info.key == 78){
+		    //Record reaction time, decision
+		    choice_history.push(info.key);
+			rt_history.push(info.key);
+		    trial.total_score = trial.total_score + hand 
+		    card_text.innerHTML = "<p> You did not change your decision. You stopped drawing cards.</p>" 
+		    var new_text = "<p>" + hand + ' will be added to your total score. Your total score is now ' + trial.total_score + '. The next card would have been ' + unsafe_card() +', pushing you over 21.'
+		    card_text.innerHTML += new_text
+		    card_text.innerHTML += '<p>Get ready for the next round!</p>'
+		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBD);
+		    endtrial()
+		}
+	}
+
+	var keyListenerN = jsPsych.pluginAPI.getKeyboardResponse({
+		callback_function: draw_card_listener,
+		valid_responses: ['y', 'n'],
+		rt_method: 'date',
+		persist: false,
+		allow_held_key: false
+	});
+
+	function endtrial() {
+		// data saving
+		var trial_data = {
+			advice_type: trial.advice_type,
+			choices_made: JSON.stringify(choice_history),
+			reaction_times: JSON.stringify(rt_history),
+			round_score: hand
+			total_score: trial.total_score
+		};
+		// end trial
+		jsPsych.finishTrial(trial_data)
+	}
 
 
-	// data saving
-	var trial_data = {
-		reaction_time: 'reaction time'
-		choice_made: 'choice made'
-	};
-
-
-
-	// end trial
-	jsPsych.finishTrial(trial_data);
 };
 
 
