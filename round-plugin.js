@@ -7,7 +7,7 @@ jsPsych.plugins["round"] = (function() {
 
 	// Default value for trial/advice type parameter (no advice)
 	trial.advice_type = trial.advice_type || 0
-	trial.total_score = trial.total_score || 0
+	trial.total_score = trial.total_score 
 
 
 	trial = jsPsych.pluginAPI.evaluateFunctionParameters(trial);
@@ -78,7 +78,7 @@ jsPsych.plugins["round"] = (function() {
 					card_text.innerHTML += txt
 					card_text.innerHTML += "<p>Get ready for the next round!</p>"
 				}
-				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
+				jsPsych.pluginAPI.cancelAllKeyboardResponses()
 				endtrial()
 			}
 			else if(trial.advice_type == 1){
@@ -122,7 +122,7 @@ jsPsych.plugins["round"] = (function() {
 				var txt = "<p>Your total score is now " + trial.total_score + ".</p>"
 				card_text.innerHTML += txt
 				card_text.innerHTML += "<p>Get ready for the next round!</p>" 
-				jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerN);
+				jsPsych.pluginAPI.cancelAllKeyboardResponses()
 				endtrial()
 			}
 			else if(trial.advice_type == 1){
@@ -170,7 +170,7 @@ jsPsych.plugins["round"] = (function() {
 		    new_text = ". The next card would have been " + unsafe_card() + ", pushing you over 21."
 		    card_text.innerHTML += new_text
 		    card_text.innerHTML += "<p>Get ready for the next round!</p>"
-		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGS);
+		    jsPsych.pluginAPI.cancelAllKeyboardResponses()
 		    endtrial()
 		} else if(info.key == 78){
 		    //Record reaction time, decision
@@ -179,7 +179,7 @@ jsPsych.plugins["round"] = (function() {
 		    var new_text = "<p>You did not change your decsion. You drew a " + unsafe_card()
 		    card_text.innerHTML += ". You exceeded 21! No points are added to your total score. "
 		    card_text.innerHTML += "Get ready for the next round!</p>"
-		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGS);
+		    jsPsych.pluginAPI.cancelAllKeyboardResponses()
 		    endtrial()
 		}
 	}
@@ -198,7 +198,7 @@ jsPsych.plugins["round"] = (function() {
 		    new_text = ". The next card would have been " + safe_card() + ", which would have been safe."
 		    card_text.innerHTML += new_text
 		    card_text.innerHTML += "<p> Get ready for the next round!</p>"
-		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBS);
+		    jsPsych.pluginAPI.cancelAllKeyboardResponses()
 		    endtrial()
 
 		}
@@ -213,7 +213,7 @@ jsPsych.plugins["round"] = (function() {
 		    var new_text2 = "<p>" + (hand+drawn)  + '<p> will be added to your total score. Your total score is now ' + trial.total_score + ". The next card would have been " + unsafe_card() + ', pushing you over 21.</p>'
 		    card_text.innerHTML += new_text2
 		    card_text.innerHTML += '<p>Get ready for the next round!</p>'
-		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBS);
+		    jsPsych.pluginAPI.cancelAllKeyboardResponses()
 		    endtrial()
 		}
 	}
@@ -231,7 +231,7 @@ jsPsych.plugins["round"] = (function() {
 		    var new_text2 = '<p>' + (hand+drawn) + ' will be added to your total score. Your total score is now ' + trial.total_score
 		    card_text.innerHTML +=new_text2
 		    card_text.innerHTML +=  "<p>Get ready for the next round!</p>"
-		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGD);
+		    jsPsych.pluginAPI.cancelAllKeyboardResponses()
 		    endtrial()
 		}
 		else if(info.key == 78){
@@ -245,7 +245,7 @@ jsPsych.plugins["round"] = (function() {
 		    var new_text2 = '<p>The next card would have been ' + safe_card() +', which would have been safe!</p>'
 		    card_text.innerHTML += new_text2
 		    card_text.innerHTML += '<p>Get ready for the next round!</p>'
-		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerGD);
+		    jsPsych.pluginAPI.cancelAllKeyboardResponses()
 		    endtrial()
 		}
 	}
@@ -259,7 +259,7 @@ jsPsych.plugins["round"] = (function() {
 		    card_text.innerHTML = new_text
 		    card_text.innerHTML += "<p>You exceeded 21! No points are added to your total score. </p>"
 		    card_text.innerHTML += "<p>Get ready for the next round!</p>"
-		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBD);
+		    jsPsych.pluginAPI.cancelAllKeyboardResponses()
 		    endtrial()
 		}
 		else if(info.key == 78){
@@ -271,7 +271,7 @@ jsPsych.plugins["round"] = (function() {
 		    var new_text = "<p>" + hand + ' will be added to your total score. Your total score is now ' + trial.total_score + '. The next card would have been ' + unsafe_card() +', pushing you over 21.'
 		    card_text.innerHTML += new_text
 		    card_text.innerHTML += '<p>Get ready for the next round!</p>'
-		    jsPsych.pluginAPI.cancelKeyboardResponse(keyListenerBD);
+		    jsPsych.pluginAPI.cancelAllKeyboardResponses()
 		    endtrial()
 		}
 	}
@@ -291,7 +291,7 @@ jsPsych.plugins["round"] = (function() {
 			choices_made: JSON.stringify(choice_history),
 			reaction_times: JSON.stringify(rt_history),
 			round_score: hand
-			total_score: trial.total_score
+			//whole_score: trial.total_score
 		};
 		// end trial
 		jsPsych.finishTrial(trial_data)

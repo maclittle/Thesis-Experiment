@@ -37,22 +37,32 @@ var instructions_block = {
   timing_post_trial: 1500
 };
 
+var total_score = 0
+
+
 var test_block = {
   type: "round",
+  total_score: function() {return total_score},
+  on_finish:
+    total_score = total_score, // how to update?,
   timeline: [
-  {advice_type: 0,
-   total_score: 0},
-  {advice_type: 0,
-  total_score: total_score},
-  {advice_type: 1,
-  total_score: total_score},
-  {advice_type: 1,
-  total_score: total_score},
-  {advice_type: 2,
-  total_score: total_score}
+  {advice_type: 0},
+  {advice_type: 0},
+  {advice_type: 0},
+  {advice_type: 0},
+  {advice_type: 0},
+  {advice_type: 0},
+  {advice_type: 0},
+  {advice_type: 0},
+  {advice_type: 0},
+  {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 2}
 
-  // ETC. How to get total score param from the plugin and pass it into the next round?
-  // otherwise the total score resets to 0 each time. 
+
+  // Concerns: total score carries over to next round but doesn't reflect the whole sum
+  // Also, pressing a key skips the rest of the dialog and jumps to the next round's start screen
+  // Experiment only runs if total score logging in the endtrial function in the plugin is commented out
 
     ]
   }
