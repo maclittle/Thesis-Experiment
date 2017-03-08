@@ -43,37 +43,45 @@ var total_score = 0
 var test_block = {
   type: "round",
   total_score: function() {return total_score},
-  on_finish:
-    total_score = total_score, // how to update?,
+  on_finish: function(data){
+    total_score = data.whole_score
+  },
   timeline: [
   {advice_type: 0},
   {advice_type: 0},
+  {advice_type: 1},
   {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 1},
   {advice_type: 0},
+  {advice_type: 2},
+  {advice_type: 1},
+  {advice_type: 1},
+  {advice_type: 1},
   {advice_type: 0},
+  {advice_type: 1},
   {advice_type: 0},
-  {advice_type: 0},
-  {advice_type: 0},
+  {advice_type: 2},
   {advice_type: 0},
   {advice_type: 0},
   {advice_type: 1},
-  {advice_type: 2}
-
-
-  // Concerns: total score carries over to next round but doesn't reflect the whole sum
-  // Also, pressing a key skips the rest of the dialog and jumps to the next round's start screen
-  // Experiment only runs if total score logging in the endtrial function in the plugin is commented out
-
+  {advice_type: 1}
     ]
   }
 
+var thanks_block = {
+  type: "text",
+  text: "<p>Thank you for participating! Please wait for the experimenter " +
+  "to proceed.</p>"
+}
 
 
   /* create experiment timeline array */
   var timeline = [];
   timeline.push(welcome_block);
-  //timeline.push(instructions_block);
+  timeline.push(instructions_block);
   timeline.push(test_block);
+  timeline.push(thanks_block);
 
   /* start the experiment */
   jsPsych.init({
