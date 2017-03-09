@@ -15,7 +15,6 @@ jsPsych.plugins["round"] = (function() {
 	// Here starts code from the html file
 	var base_html =
 	'<div id="round" style="width:800px; height: 400px; position: relative;">'+
-	//'<div id="robot"> <img src = "img/robot.png" style="position: absolute; width: 115px; height: 150px; top:-500; left:-700;  background-color: #f00;"/></div>'+
 	'<div id="score"></div>'+
 	'<div id="card_text"></div>'+
 	'</div>'
@@ -177,6 +176,7 @@ jsPsych.plugins["round"] = (function() {
 		    choice_history.push(info.key);
 			rt_history.push(info.rt);
 		    var new_text = "<p>You did not change your decsion. You drew: " + unsafe_card()
+		    card_text.innerHTML = new_text
 		    card_text.innerHTML += ". You exceeded 21! No points are added to your total score. "
 		    card_text.innerHTML += "Get ready for the next round!</p><p> Press any key to continue.</p>"
 		    jsPsych.pluginAPI.cancelAllKeyboardResponses()
@@ -363,10 +363,10 @@ jsPsych.plugins["round"] = (function() {
 
 	var next2 = function(info){
 		trial.total_score = trial.total_score + hand
-				card_text.innerHTML = "You stopped drawing cards. ";
+				card_text.innerHTML = "<p>You stopped drawing cards. ";
 				card_text.innerHTML += hand
-				card_text.innerHTML += " will be added to your total score. ";
-				var txt = "<p>Your total score is now " + trial.total_score + ".</p>"
+				card_text.innerHTML += " will be added to your total score.";
+				var txt = "Your total score is now " + trial.total_score + ".</p>"
 				card_text.innerHTML += txt
 				card_text.innerHTML += "<p>Get ready for the next round!</p><p> Press any key to continue.</p>" 
 				jsPsych.pluginAPI.cancelAllKeyboardResponses()

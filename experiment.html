@@ -20,22 +20,29 @@
 };
 
 /* define instructions block */
-var instructions_block = {
+var instructions_block1 = {
   type: "text",
   text: "<p>In this experiment, you will be dealt a hand of cards, " +
-  "and you will see the hand's total. You will have the option to draw another card.</p>" +
-  "<p>If your hand's total  is <strong>over 21</strong>, you lose " +
-  "and no points are added to your total score.</p>" +
-  " <p>If your hand's total is <strong>under 21</strong>, you win " +
-  "and the hand's total is added to your total score.</p>" +
-  "<p> Draw a card by pressing Y for yes, or N for no when prompted.</p>"+
-  "<div class='left center-content'><img src='img/robot.png'></img>" +
-  "<p>This robot will give you advice at the end of every round. You will " +
+  "and you will only see their sum. You will have the option to draw another card to your hand.</p>" +
+  "<p>If your hand is <strong>over 21</strong>, you lose the round " +
+  "and no points will be added to your total score.</p>" +
+  " <p>If your hand is <strong>under 21</strong>, you win the round " +
+  "and the new hand will be added to your total score.</p>" +
+  "<p> Draw a card by pressing Y for yes, or N for no when prompted.</p>" +
+  "<p> Press any key to continue. </p>"
+};
+
+var instructions_block2 = {
+  type: "text",
+  text: "<div class='left center-content'><img src='img/robot.png'></img>" +
+  "<p>The program running on the adjacent computer is represented by this robot cartoon.</p>"+
+  "<p>It will give you advice at the end of every round as to whether you should draw or not.</p>" +
+  "<p>If its opinion differs from yours, you will " +
   "have the option to change your decision to agree with him, or not, by " +
   "pressing Y for yes and N for no.</p>"+
-  "<p>Press any key to begin.</p>",
-  timing_post_trial: 1500
-};
+  "<p>Press any key to begin the experiment.</p>",
+  timing_post_trial: 600
+}
 
 var total_score = 0
 
@@ -46,7 +53,7 @@ var test_block = {
   on_finish: function(data){
     total_score = data.whole_score
   },
-  timeline: [
+  timeline: [ // 50 trials: 8 bad, 18 neutral, 24 good
   {advice_type: 0},
   {advice_type: 0},
   {advice_type: 1},
@@ -63,9 +70,40 @@ var test_block = {
   {advice_type: 0},
   {advice_type: 2},
   {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 2},
+  {advice_type: 1},
+  {advice_type: 1},
+  {advice_type: 1},
+  {advice_type: 1},
   {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 0},
+  {advice_type: 2},
+  {advice_type: 2},
+  {advice_type: 1},
+  {advice_type: 1},
+  {advice_type: 2},
+  {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 0},
+  {advice_type: 2},
   {advice_type: 1},
   {advice_type: 1}
+  {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 0},
+  {advice_type: 1},
+  {advice_type: 0},
+  {advice_type: 2},
+  {advice_type: 1},
+  {advice_type: 0}
     ]
   }
 
@@ -79,7 +117,8 @@ var thanks_block = {
   /* create experiment timeline array */
   var timeline = [];
   timeline.push(welcome_block);
-  timeline.push(instructions_block);
+  timeline.push(instructions_block1);
+  timeline.push(instructions_block2)
   timeline.push(test_block);
   timeline.push(thanks_block);
 
